@@ -15,4 +15,4 @@ pipelines:
           - apt-get install -y git
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
           - composer install
-          - vendor/bin/phpunit
+          - vendor/bin/phpunit -c tests/phpunit.xml
