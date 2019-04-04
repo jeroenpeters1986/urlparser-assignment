@@ -26,24 +26,31 @@ namespace UrlParser;
  */
 class UrlParser
 {
-    private $url, $host, $domain, $tld, $path, $anchor;
+    private $url;
+    private $host;
+    private $domain;
+    private $tld;
+    private $path;
+    private $anchor;
+    private $valid_tld_list = [];
+    private $request_query_params = [];
     private $protocol = "http";
     private $is_secure = false;
-    public $valid_tld_list, $request_query_params = [];
 
+    /**
+     * UrlParser constructor which takes a single URL
+     * @param $url
+     */
     public function __construct($url)
     {
         $this->url = strtolower($url);
-        $this->get_valid_tlds();
-        $this->parse_url();
-        $this->determine_tld();
-        $this->determine_domain();
+        $this->parseUrl();
     }
 
     /* Parse the URL and feed the internal strings */
-    private function parse_url()
+    public function parseUrl()
     {
-        if (strpos($this->url, "https") === 0){
+        if (strpos($this->url, "https") === 0) {
             $this->protocol = "https";
             $this->is_secure = true;
         }
@@ -57,8 +64,7 @@ class UrlParser
         $request_path = array_pop($url_parts);
 
         /* Separate the anchorlink indicator from the query strings, if any */
-        if(strpos($request_path, "#") !== false)
-        {
+        if (strpos($request_path, "#") !== false) {
             $request_parts = explode("#", $request_path, 2);
             $this->anchor = array_pop($request_parts);
             $request_path = array_shift($request_parts);
@@ -68,26 +74,26 @@ class UrlParser
         $request_parts = explode("?", $request_path, 2);
         $this->path = array_shift($request_parts);
 
-        if(! empty($request_parts))
-        {
-            $this->query_params_to_array(array_shift($request_parts));
+        if (!empty($request_parts)) {
+            $this->queryParamsToArray(array_shift($request_parts));
         }
+
+        $this->determineTld();
+        $this->determineDomain();
     }
 
     /**
      * Get a list of all currently valid TLD's available to register on the internet
      * The list is maintained by PublicSuffix.org
      */
-    private function get_valid_tlds()
+    private function getValidTLDs()
     {
         $this->valid_tld_list = [];
         $tld_list = file_get_contents("https://publicsuffix.org/list/public_suffix_list.dat");
         $list_line = explode("\n", $tld_list);
 
-        foreach($list_line as $tld)
-        {
-            if(! empty($tld) && substr($tld, 0, 2) != "//")
-            {
+        foreach ($list_line as $tld) {
+            if (!empty($tld) && substr($tld, 0, 2) != "//") {
                 $this->valid_tld_list[] = $tld;
             }
         }
@@ -99,15 +105,15 @@ class UrlParser
     /**
      * Determine the TLD by comparing the tld's in our list to the host
      */
-    private function determine_tld()
+    private function determineTld()
     {
-        foreach($this->valid_tld_list as $tld)
-        {
+        $this->getValidTLDs();
+
+        foreach ($this->valid_tld_list as $tld) {
             /* Compare the last X characters of the host to find a matching TLD,
                depending on the size of the tld in the list */
             $tld_len = strlen($tld);
-            if(substr_compare($this->host, $tld, (strlen($this->host)-$tld_len), $tld_len) === 0)
-            {
+            if (substr_compare($this->host, $tld, (strlen($this->host) - $tld_len), $tld_len) === 0) {
                 $this->tld = $tld;
                 break;
             }
@@ -118,7 +124,7 @@ class UrlParser
      * Determine the domain, this can be done by disarming the TLD, check the latest host-part
      * and put back the TLD again.
      */
-    private function determine_domain()
+    private function determineDomain()
     {
         $domain = str_replace("." . $this->tld, '', $this->host);
         $domain_parts = explode(".", $domain);
@@ -129,12 +135,11 @@ class UrlParser
      * Parse the request string to a key-value array
      * @param $query_string
      */
-    private function query_params_to_array($query_string)
+    private function queryParamsToArray($query_string)
     {
-        foreach(explode('&', $query_string) as $param)
-        {
+        foreach (explode('&', $query_string) as $param) {
             $parts = explode('=', $param);
-            $this->request_query_params[array_shift($parts)] = (! empty($parts) ? array_pop($parts) : '');
+            $this->request_query_params[array_shift($parts)] = (!empty($parts) ? array_pop($parts) : '');
         }
     }
 
@@ -148,44 +153,43 @@ class UrlParser
     }
 
     /* Typical getters */
-    public function is_secure()
+    public function isSecure()
     {
         return $this->is_secure;
     }
 
-    public function get_tld_list()
+    public function getTldList()
     {
         return $this->valid_tld_list;
     }
 
-    public function get_path()
+    public function getPath()
     {
         return $this->path;
     }
 
-    public function get_tld()
+    public function getTld()
     {
         return $this->tld;
     }
 
-    public function get_domain()
+    public function getDomain()
     {
         return $this->domain;
     }
 
-    public function get_anchor()
+    public function getAnchor()
     {
         return $this->anchor;
     }
 
-    public function get_host()
+    public function getHost()
     {
         return $this->host;
     }
 
-    public function get_request_query_params()
+    public function getRequestQueryParams()
     {
         return $this->request_query_params;
     }
-
 }
