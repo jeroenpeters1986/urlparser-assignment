@@ -1,9 +1,15 @@
 <?php
-
-namespace UrlParser;
+declare(strict_types = 1);
 
 /**
- * Simple URL Parser, as part of a test assignment for CTD
+ * UrlParser assignment
+ * php version 7.0
+ *
+ * @category Class
+ * @package  None
+ * @author   Jeroen Peters <mail@jeroenpeters.com>
+ * @license  https://www.gnu.org/licenses/gpl-3.0.txt GNU/GPLv3
+ * @link     https://www.jeroenpeters.dev
  *
  * The assignment:
  *   Create a simple class which parses an URL
@@ -23,6 +29,12 @@ namespace UrlParser;
  *   - this DOES recon all public TLD suffixes, there are a lot of them since
  *     ICANN opened up generic TLD's, and it's almost impossible to REGEX,
  *     which I'd prefered (https://publicsuffix.org/list/public_suffix_list.dat)
+ */
+
+namespace UrlParser;
+
+/**
+ * Simple URL Parser, as part of a test assignment for CTD
  *
  * Class UrlParser
  * @package UrlParser
