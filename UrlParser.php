@@ -88,15 +88,17 @@ class UrlParser
         $request_path = array_pop($url_parts);
 
         /* Separate the anchorlink indicator from the query strings, if any */
-        if (strpos($request_path, "#") !== false) {
+        if (!empty($request_path) && strpos($request_path, "#") !== false) {
             $request_parts = explode("#", $request_path, 2);
             $this->_anchor = array_pop($request_parts);
             $request_path = array_shift($request_parts);
         }
 
         /* Separate the request params from the path */
-        $request_parts = explode("?", $request_path, 2);
-        $this->_path = array_shift($request_parts);
+        if (! empty($request_path)) {
+            $request_parts = explode("?", $request_path, 2);
+            $this->_path = array_shift($request_parts);
+        }
 
         if (!empty($request_parts)) {
             $this->_queryParamsToArray(array_shift($request_parts));
