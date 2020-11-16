@@ -41,7 +41,7 @@ class UrlParserTest extends TestCase
 
     public function testUrlDomain()
     {
-        $urlparser = new \UrlParser\UrlParser('https://www.quoteshirts.nl/informatie-over-quoteshirts-4.html');
+        $urlparser = new \UrlParser\UrlParser('https://www.quoteshirts.nl/over-ons/');
         $this->assertEquals("quoteshirts.nl", $urlparser->getDomain());
         $urlparser = new \UrlParser\UrlParser('https://henk.co.uk/film/');
         $this->assertEquals("henk.co.uk", $urlparser->getDomain());
